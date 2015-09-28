@@ -1,0 +1,32 @@
+# Automatically abort script on errors
+option batch abort
+# Disable overwrite confirmations that conflict with the previous
+option confirm off
+# Connect
+open scp://ec2-user@54.69.227.147 -hostkey="*" -privatekey="D:\ETH\Fall 2014\ASL\keys\new_AWS.ppk"
+# Change remote directory
+cd /home/ec2-user
+mkdir asl
+cd asl
+put C:\Users\Amrollah\IdeaProjects\asl\build.xml
+mkdir dist
+mkdir lib
+mkdir build
+mkdir src
+cd dist/
+# Force binary mode transfer
+option transfer binary
+# Download file to the local directory d:\
+#get examplefile.txt d:\
+# Upload the file to current working directory
+put C:\Users\Amrollah\IdeaProjects\asl\dist\
+cd ../lib
+put C:\Users\Amrollah\IdeaProjects\asl\lib\
+cd ../build
+put C:\Users\Amrollah\IdeaProjects\asl\build\
+cd ../src
+put C:\Users\Amrollah\IdeaProjects\asl\src\
+# Disconnect
+close
+# Exit WinSCP
+exit

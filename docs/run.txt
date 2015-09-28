@@ -1,0 +1,5 @@
+I run these commands with appropriate parameters for different experiments manually on machines.
+
+ant -Ddb_host=172.31.25.68 -Ddb_user=postgres -Ddb_pass=1111 -Ddb_test=false DB-Monitor
+ant -Dserver_host=172.31.9.249,172.31.9.249  -Dcl_number=40 -Dclient_type=client -Doffset=0 -Drun_time=10 run-clients
+ant -Ddb_host=172.31.25.68  -Dworkers=8 run-middleware

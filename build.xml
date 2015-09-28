@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     Oct 20, 2014 7:48:41 PM
+
+     ASL course 2014
+                   
+     amrollah                                                                
+     ====================================================================== -->
+<project name="asl" default="dist" basedir=".">
+    <description>
+        ASL course 2014
+    </description>
+
+    <!-- set global properties for this build -->
+    <property name="build.compiler" value="javac1.7"/>
+    <property name="user.name" value="Amrollah"/>
+    <property name="src.dir" location="src"/>
+    <property name="lib.dir" location="lib"/>
+    <property name="build.dir" location="build"/>
+    <property name="dist.dir" location="dist"/>
+    <property name="bin.dir" location="bin"/>
+    <property name="log.dir" location="log"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="server-manifest.file" value="${dist.dir}/SERVER-MANIFEST.MF"/>
+    <property name="client-manifest.file" value="${dist.dir}/CLIENT-MANIFEST.MF"/>
+    <property name="server.class" value="asl.server.Server"/>
+    <property name="client.class" value="asl.client.Client"/>
+    <property name="DB_monitor.class" value="asl.db.Monitor_DB"/>
+    <property name="log_parser.class" value="asl.analytics.log_parser"/>
+    <property name="test.class" value="asl.client.my_test"/>
+
+
+    <path id="project.classpath">
+        <fileset dir="${lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${src.dir}">
+        </fileset>
+    </path>
+
+    <target name="init">
+        <!-- Create the time stamp -->
+        <tstamp/>
+        <!-- Create the build directory structure used by compile -->
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${log.dir}"/>
+    </target>
+
+    <target name="log_analytics" depends="dist" description="Parse ans analyse log files">
+        <java classname="${log_parser.class}" fork="true">
+            <classpath>
+                <path refid="project.classpath"/>
+                <path location="${dist.dir}/${ant.project.name}.jar"/>
+            </classpath>
+            <arg value="${log_dir}"/>
+        </java>
+    </target>
+
+    <target name="compile" depends="init" description="builds the project files">
+        <javac debug="true" debuglevel="${debuglevel}" srcdir="${src.dir}" destdir="${build.dir}"
+               classpathref="project.classpath" includeantruntime="false"/>
+    </target>
+
+    <!-- =================================
+          target: jar              
+         ================================= -->
+    <target name="dist" depends="compile" description="generate the distribution jar file">
+        <mkdir dir="${dist.dir}"/>
+        <jar jarfile="${dist.dir}/${ant.project.name}.jar" basedir="${build.dir}">
+            <!--manifest="${server-manifest.file}">-->
+            <fileset dir="${build.dir}" includes="**/*.class"/>
+            <zipgroupfileset dir="${lib.dir}" includes="postgresql-9.2-1003.jdbc4.jar"/>
+        </jar>
+    </target>
+
+    <!-- - - - - - - - - - - - - - - - - -
+              target: Run
+             - - - - - - - - - - - - - - - - - -->
+
+    <target name="run-local" depends="dist" description="execute the jar file">
+        <parallel>
+            <sequential>
+                <java classname="${server.class}" fork="true">
+                    <classpath>
+                        <path refid="project.classpath"/>
+                        <path location="${dist.dir}/${ant.project.name}.jar"/>
+                    </classpath>
+                    <arg value="3456"/>
+                    <arg value="localhost"/>
+                    <arg value="5432"/>
+                    <arg value="postgres"/>
+                    <arg value="1111"/>
+                    <arg value="1"/>
+                </java>
+            </sequential>
+            <sequential>
+                <sleep seconds="3"/>
+                <java classname="${client.class}" fork="true">
+                    <classpath>
+                        <path refid="project.classpath"/>
+                        <path location="${dist.dir}/${ant.project.name}.jar"/>
+                    </classpath>
+                    <arg value="10"/>
+                    <arg value="0"/>
+                    <arg value="5"/>
+                    <arg value="localhost"/>
+                    <arg value="client"/>
+                </java>
+            </sequential>
+        </parallel>
+    </target>
+
+    <target name="run-middleware" depends="dist" description="execute the jar file">
+        <java classname="${server.class}" fork="true">
+            <classpath>
+                <path refid="project.classpath"/>
+                <path location="${dist.dir}/${ant.project.name}.jar"/>
+            </classpath>
+            <arg value="3456"/>
+            <arg value="${db_host}"/>
+            <arg value="5432"/>
+            <arg value="asl"/>
+            <arg value="asldatabase"/>
+            <arg value="${workers}"/>
+        </java>
+    </target>
+
+
+    <target name="run-clients" depends="dist" description="run some clients">
+        <java classname="${client.class}" fork="true">
+            <classpath>
+                <path refid="project.classpath"/>
+                <path location="${dist.dir}/${ant.project.name}.jar"/>
+            </classpath>
+            <arg value="${cl_number}"/>
+            <arg value="${offset}"/>
+            <arg value="${run_time}"/>
+            <arg value="${server_host}"/>
+            <arg value="${client_type}"/>
+        </java>
+    </target>
+
+    <target name="DB-Monitor" depends="dist" description="monitors the DB">
+        <java classname="${DB_monitor.class}" fork="true">
+            <classpath>
+                <path refid="project.classpath"/>
+                <path location="${dist.dir}/${ant.project.name}.jar"/>
+            </classpath>
+            <arg value="${db_host}"/>
+            <arg value="5432"/>
+            <arg value="${db_user}"/>
+            <arg value="${db_pass}"/>
+            <arg value="${db_test}"/>
+        </java>
+    </target>
+
+
+    <target name="test" depends="dist" description="tes">
+        <java classname="${test.class}" fork="true">
+            <classpath>
+                <path refid="project.classpath"/>
+                <path location="${dist.dir}/${ant.project.name}.jar"/>
+            </classpath>
+        </java>
+    </target>
+
+
+    <!-- - - - - - - - - - - - - - - - - -
+          target: Clean-up                      
+         - - - - - - - - - - - - - - - - - -->
+
+    <target name="clean" description="clean up">
+        <!-- Delete the ${build.dir} and ${dist.dir} directory trees -->
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+        <delete dir="${bin.dir}"/>
+    </target>
+    <target name="cleanall" depends="clean">
+        <delete dir="${log.dir}"/>
+    </target>
+
+</project>

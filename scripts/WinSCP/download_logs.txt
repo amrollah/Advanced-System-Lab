@@ -1,0 +1,21 @@
+# Automatically abort script on errors
+option batch abort
+# Disable overwrite confirmations that conflict with the previous
+option confirm off
+
+# Connect Clients1
+open scp://ec2-user@54.149.163.40 -hostkey="*"
+cd /home/ec2-user/asl/log
+get * "D:\ETH\Fall2014\ASL\last_logs\%1%\c1_log\"
+option transfer binary
+close
+
+# Connect Server1
+open scp://ec2-user@54.68.204.133 -hostkey="*"
+cd /home/ec2-user/asl/log
+get * "D:\ETH\Fall2014\ASL\last_logs\%1%\m1_log\"
+option transfer binary
+close
+
+# Exit WinSCP
+exit

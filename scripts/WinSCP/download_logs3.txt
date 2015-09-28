@@ -1,0 +1,23 @@
+# Automatically abort script on errors
+option batch abort
+# Disable overwrite confirmations that conflict with the previous
+option confirm off
+
+# Connect Clients1
+open scp://ec2-user@54.149.115.151 -hostkey="*"
+cd /home/ec2-user/asl/log
+get * "D:\ETH\Fall2014\ASL\last_logs\%1%\c3_log\"
+option transfer binary
+close
+
+open scp://ec2-user@54.149.46.87 -hostkey="*"
+cd /home/ec2-user/asl/log
+get * "D:\ETH\Fall2014\ASL\last_logs\%1%\m3_log\"
+option transfer binary
+close
+
+
+# Exit WinSCP
+exit
+
+#  -privatekey="D:\ETH\Fall 2014\ASL\keys\new_AWS.ppk"

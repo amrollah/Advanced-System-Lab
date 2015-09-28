@@ -1,0 +1,54 @@
+This document specifies the layout of the strings the server accepts.
+>>> denotes the content the client sends.
+<<< denotes the answer one would expect on success from server.
+
+[User creation]
+To create a user send the following string to the server. It will return
+the id of the new user as a string.
+>>> "register\n"
+<<< "OK\nid:{id|int}"
+
+[Queue manipulation]
+This string creates a queue named {name} and will return the id which represents
+this queue.
+>>>"create queue"
+<<<"OK\nid:{id|int}
+
+To delete a queue:
+>>>"delete queue\nid:{id|int}"
+<<<"OK\n"
+
+[Messages]
+To send a content use the following string, receiver is optional
+
+>>>"send\nsender:{sender|int};queue:{queue|int};receiver:{receiver|int};content:{content|string}"
+
+The following string lets you peek at a content, again the last three arguments are optional and will only be in the answer
+if they are set.
+
+>>>"get msg\nqueue:{queue|int};receiver:{receiver|int}"
+<<<"OK\nsender:{sender|int};queue:{queue|int};content:{content|string};receiver:{receiver|int}"
+
+The following string consumes a string, again same arguments as before
+
+>>>"read msg\nqueue:{queue|int};receiver:{receiver|int}"
+<<<"OK\nsender:{sender|int};queue:{queue|int};content:{content|string};receiver:{receiver|int}"
+
+[Queue querying]
+
+To list all queues use the following string
+
+>>>"list queues\n"
+<<<"OK\nqueues:{queues|list of int}"
+
+To list all queues with messages for a recipient
+
+>>>"list queues\nreceiver:{receiver}"
+<<<"OK\nqueues:{ids|list of int}"
+
+[User querying]
+
+To list all clients use the following string
+
+>>>"list users\n"
+<<<"OK\nusers:{users|list of int}"

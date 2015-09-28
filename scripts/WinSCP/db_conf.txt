@@ -1,0 +1,21 @@
+# Automatically abort script on errors
+option batch abort
+# Disable overwrite confirmations that conflict with the previous
+option confirm off
+
+# Connect large_db
+open scp://ec2-user@54.68.105.56 -hostkey="*"
+get pg_hba.conf "D:\ETH\Fall2014\ASL\db_conf\"
+get /home/ec2-user/.ssh/id_rsa "D:\ETH\Fall2014\ASL\db_conf\ssh\"
+get /home/ec2-user/.ssh/id_rsa.pub "D:\ETH\Fall2014\ASL\db_conf\ssh\"
+option transfer binary
+close
+
+# Xlarge_DB
+open scp://ec2-user@54.148.141.25 -hostkey="*"
+put D:\ETH\Fall2014\ASL\db_conf\ssh\* /home/ec2-user/
+option transfer binary
+close
+
+# Exit WinSCP
+exit
